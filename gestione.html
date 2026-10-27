@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gestione LIM Istituto Caso</title>
+<style>
+:root{--bg:#eef1f5;--surface:#fff;--ink:#12263a;--muted:#5b6b7c;--line:#d3dae3;--accent:#ffd400;--accent-ink:#2b2400;--navy:#12324f;--ok:#16794c;--err:#b3261e;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#0e1823;--surface:#16232f;--ink:#e7eef5;--muted:#93a4b5;--line:#2a3b4b;--navy:#0a2238;--ok:#4cc38a;--err:#ff8a80;color-scheme:dark}}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,'Segoe UI',sans-serif;margin:0;padding:0 16px 48px}
+.wrap{max-width:1040px;margin:0 auto}
+header{padding:28px 0 16px;display:flex;flex-wrap:wrap;gap:16px 32px;align-items:flex-end;justify-content:space-between}
+h1{font-size:clamp(26px,5vw,38px);line-height:1.1;margin:0;font-weight:800}
+.sub{color:var(--muted);margin:8px 0 0;max-width:56ch}
+.links{display:flex;flex-wrap:wrap;gap:10px}
+.links a{background:var(--navy);color:#fff;text-decoration:none;padding:10px 14px;border-radius:8px;font-weight:600;border-bottom:3px solid var(--accent)}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+details.conn{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-bottom:18px}
+details.conn summary{cursor:pointer;font-weight:700}
+.conn .f{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:12px}
+.conn .full{grid-column:1/-1}
+.hint{color:var(--muted);font-size:13px;margin:8px 0 0}
+#status{margin:0 0 18px;padding:10px 14px;border-radius:8px;background:var(--surface);border:1px solid var(--line);color:var(--muted);display:flex;gap:10px;align-items:center}
+#status i{width:10px;height:10px;border-radius:50%;background:var(--muted);flex:none}
+#status.on i{background:var(--ok)}#status.off i{background:var(--err)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:18px}
+.slot{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.slot h2{font-size:20px;margin:0;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.slot h2 small{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:500}
+.screen{aspect-ratio:2.7/1.73;background:#fdfdfd;border:6px solid var(--navy);border-radius:6px;display:grid;place-items:center;overflow:hidden;color:#8b96a3;text-align:center;font-weight:600;padding:8px}
+.screen img{width:100%;height:100%;object-fit:cover;display:block;max-width:none}
+label{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px}
+input[type=url],input[type=text],input[type=password]{width:100%;padding:10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit}
+label.file{display:block;text-transform:none;letter-spacing:0;font-size:14px;color:var(--ink);border:1.5px dashed var(--muted);border-radius:8px;padding:10px;text-align:center;cursor:pointer;margin:0;position:relative}
+label.file input{position:absolute;opacity:0;inset:0;width:100%;height:100%;cursor:pointer}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}
+button{font:600 14px system-ui,sans-serif;padding:10px 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+button.p{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button:disabled{opacity:.5;cursor:default}
+.msg{min-height:20px;font-size:13px;color:var(--muted)}.msg.ok{color:var(--ok)}.msg.err{color:var(--err)}
+.note{margin-top:22px;color:var(--muted);font-size:13px;max-width:72ch}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div>
+    <h1>Gestione LIM Istituto Caso</h1>
+    <p class="sub">Scegli immagine e sito per ciascuna LIM del Laboratorio di Informatica. Quando salvi, cambiano nella passeggiata 3D e nella versione Halloween.</p>
+  </div>
+  <nav class="links" aria-label="Passeggiate 3D">
+    <a href="caso.html" target="_blank" rel="noopener">Passeggiata 3D</a>
+    <a href="halloween.html" target="_blank" rel="noopener">Versione Halloween</a>
+  </nav>
+</header>
+
+<details class="conn" id="conn">
+  <summary>Collegamento a GitHub (da fare una volta sola)</summary>
+  <div class="f">
+    <div><label for="owner">Utente o organizzazione</label><input type="text" id="owner" autocomplete="off" placeholder="mio-utente"></div>
+    <div><label for="repo">Nome del repository</label><input type="text" id="repo" autocomplete="off" placeholder="lim-istituto-caso"></div>
+    <div><label for="branch">Ramo</label><input type="text" id="branch" value="main" autocomplete="off"></div>
+    <div class="full"><label for="token">Token di accesso (resta solo in questo browser)</label><input type="password" id="token" autocomplete="off" placeholder="github_pat_…"></div>
+    <div class="full row"><button class="p" id="saveConn">Salva collegamento</button><button id="testConn">Prova il collegamento</button></div>
+  </div>
+  <p class="msg" id="connMsg" role="status"></p>
+  <p class="hint">Il token si crea su GitHub: Settings → Developer settings → Personal access tokens → Fine-grained tokens. Scegli solo questo repository e il permesso Contents: Read and write. Chi ha il token può modificare il repository: non condividerlo.</p>
+</details>
+
+<p id="status"><i></i><span>Caricamento della configurazione…</span></p>
+<div class="grid" id="grid"></div>
+<p class="note">Dopo il salvataggio GitHub Pages impiega di solito da uno a due minuti a pubblicare. Le passeggiate controllano le novità ogni minuto e quando la pagina torna in primo piano. Le immagini vengono ridimensionate a 1920 px.</p>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  var LABELS=['LIM 1','LIM 2','LIM 3'], KEY='lim_admin_v1', API='https://api.github.com';
+  var cfg={v:0,slots:[{},{},{}]}, pending=[null,null,null], busy=false;
+  var grid=document.getElementById('grid'), statusEl=document.getElementById('status');
+  var conn=loadConn();
+
+  function loadConn(){
+    var c={owner:'',repo:'',branch:'main',token:''};
+    try{var s=JSON.parse(localStorage.getItem(KEY)||'null');if(s)Object.assign(c,s)}catch(e){}
+    if((!c.owner||!c.repo)&&/\.github\.io$/.test(location.hostname)){
+      c.owner=location.hostname.split('.')[0];c.repo=location.pathname.split('/')[1]||c.repo;
+    }
+    return c;
+  }
+  function saveConn(){try{localStorage.setItem(KEY,JSON.stringify(conn));return true}catch(e){return false}}
+  function $(id){return document.getElementById(id)}
+  function setStatus(cls,t){statusEl.className=cls;statusEl.querySelector('span').textContent=t}
+  function msg(i,t,c){var m=$('m'+i);m.textContent=t||'';m.className='msg '+(c||'')}
+  function connMsg(t,c){var m=$('connMsg');m.textContent=t||'';m.className='msg '+(c||'')}
+  function norm(u){u=(u||'').trim();if(!u)return'';if(!/^https?:\/\//i.test(u))u='https://'+u;try{var p=new URL(u);return(p.protocol==='http:'||p.protocol==='https:')?p.href:''}catch(e){return''}}
+  function connReady(){return conn.owner&&conn.repo&&conn.branch&&conn.token}
+
+  // ---- GitHub API ----
+  function headers(){return{'Authorization':'Bearer '+conn.token,'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}}
+  function repoUrl(p){return API+'/repos/'+encodeURIComponent(conn.owner)+'/'+encodeURIComponent(conn.repo)+(p||'')}
+  async function gh(url,opt){
+    var r=await fetch(url,Object.assign({headers:headers()},opt||{}));
+    if(r.status===401)throw new Error('Token non valido o scaduto.');
+    if(r.status===403)throw new Error('Permesso negato. Controlla che il token abbia Contents: Read and write su questo repository.');
+    return r;
+  }
+  async function getFile(path){
+    var r=await gh(repoUrl('/contents/'+path+'?ref='+encodeURIComponent(conn.branch)+'&t='+Date.now()));
+    if(r.status===404)return null;
+    if(!r.ok)throw new Error('GitHub ha risposto '+r.status+'.');
+    return r.json();
+  }
+  async function putFile(path,b64,message,sha){
+    var body={message:message,content:b64,branch:conn.branch};if(sha)body.sha=sha;
+    var r=await gh(repoUrl('/contents/'+path),{method:'PUT',body:JSON.stringify(body)});
+    if(r.status===409||r.status===422){var e=new Error('conflict');e.conflict=true;throw e}
+    if(r.status===404)throw new Error('Repository o ramo non trovati. Controlla il collegamento.');
+    if(!r.ok)throw new Error('GitHub ha risposto '+r.status+'.');
+    return r.json();
+  }
+  function utf8ToB64(s){var b=new TextEncoder().encode(s),o='';for(var i=0;i<b.length;i++)o+=String.fromCharCode(b[i]);return btoa(o)}
+  function b64ToUtf8(b){var bin=atob(b.replace(/\s/g,'')),a=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return new TextDecoder().decode(a)}
+  function blobToB64(blob){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){res(String(r.result).split(',')[1])};r.onerror=rej;r.readAsDataURL(blob)})}
+
+  // ---- interfaccia ----
+  function build(){
+    LABELS.forEach(function(name,i){
+      var s=document.createElement('section');s.className='slot';
+      s.innerHTML='<h2>'+name+'<small>Informatica</small></h2>'+
+        '<div class="screen" id="pv'+i+'">Nessuna immagine</div>'+
+        '<div><label>Immagine</label><label class="file"><input type="file" id="f'+i+'" accept="image/*"><span id="fn'+i+'">Scegli un file dal dispositivo</span></label></div>'+
+        '<div><label for="u'+i+'">Sito collegato</label><input type="url" id="u'+i+'" placeholder="https://esempio.it" inputmode="url"></div>'+
+        '<div class="msg" id="m'+i+'" role="status"></div>'+
+        '<div class="row"><button class="p" id="s'+i+'">Salva</button><button id="r'+i+'">Svuota</button></div>';
+      grid.appendChild(s);
+      $('f'+i).addEventListener('change',function(e){onFile(i,e.target.files&&e.target.files[0])});
+      $('s'+i).addEventListener('click',function(){save(i,false)});
+      $('r'+i).addEventListener('click',function(){save(i,true)});
+    });
+  }
+  function showPreview(i,src){
+    var pv=$('pv'+i);pv.textContent='';
+    if(!src){pv.textContent='Nessuna immagine';return}
+    var im=new Image();im.alt='Anteprima '+LABELS[i];im.src=src;pv.appendChild(im);
+  }
+  function render(){
+    for(var i=0;i<3;i++){
+      var s=cfg.slots[i]||{};
+      if(!pending[i])showPreview(i,s.img?s.img+'?v='+(s.v||cfg.v||''):'');
+      var u=$('u'+i);if(document.activeElement!==u)u.value=s.url||'';
+    }
+  }
+  function onFile(i,f){
+    if(!f)return;
+    $('fn'+i).textContent=f.name;msg(i,'Preparazione immagine…');
+    var rd=new FileReader();
+    rd.onload=function(){var im=new Image();im.onload=function(){
+      var k=Math.min(1,1920/Math.max(im.width,im.height)),c=document.createElement('canvas');
+      c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);
+      var x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);
+      c.toBlob(function(b){pending[i]=b;showPreview(i,URL.createObjectURL(b));msg(i,'Immagine pronta. Premi Salva per pubblicarla.')},'image/jpeg',.86)};
+      im.onerror=function(){msg(i,'Il file non è un\'immagine valida.','err')};im.src=rd.result};
+    rd.readAsDataURL(f);
+  }
+
+  async function save(i,clear){
+    if(busy)return;
+    if(!connReady()){$('conn').open=true;msg(i,'Prima completa il collegamento a GitHub qui sopra.','err');return}
+    var url='',raw=$('u'+i).value.trim();
+    if(!clear){url=norm(raw);if(raw&&!url){msg(i,'Indirizzo non valido. Usa un sito che inizia con http:// o https://','err');return}}
+    busy=true;setBtns(true);msg(i,'Pubblicazione su GitHub…');
+    try{
+      var imgPath=null,now=Date.now(),keep=(cfg.slots[i]&&cfg.slots[i].img)||'';
+      if(clear)keep='';
+      if(pending[i]&&!clear){
+        imgPath='images/lim'+(i+1)+'.jpg';
+        var ex=await getFile(imgPath);
+        await putFile(imgPath,await blobToB64(pending[i]),'LIM '+(i+1)+': nuova immagine',ex&&ex.sha);
+        keep=imgPath;
+      }
+      var tries=0,newCfg;
+      while(true){
+        var cur=await getFile('lim-config.json'),base={v:0,slots:[{},{},{}]};
+        if(cur){try{base=JSON.parse(b64ToUtf8(cur.content))}catch(e){}}
+        if(!Array.isArray(base.slots))base.slots=[{},{},{}];
+        while(base.slots.length<3)base.slots.push({});
+        base.slots[i]={img:keep,url:url,v:now};base.v=now;newCfg=base;
+        try{await putFile('lim-config.json',utf8ToB64(JSON.stringify(base,null,2)+'\n'),'LIM '+(i+1)+': aggiornamento',cur&&cur.sha);break}
+        catch(e){if(e.conflict&&++tries<3)continue;throw e}
+      }
+      cfg=newCfg;pending[i]=null;$('f'+i).value='';$('fn'+i).textContent='Scegli un file dal dispositivo';
+      render();msg(i,clear?'Schermo svuotato. Online tra circa un minuto.':'Salvato su GitHub. Online tra circa un minuto.','ok');
+      watch(now,i);
+    }catch(e){msg(i,e.conflict?'Qualcun altro ha modificato la configurazione. Riprova.':(e&&e.message)||'Salvataggio non riuscito.','err')}
+    busy=false;setBtns(false);
+  }
+  function setBtns(d){document.querySelectorAll('.slot button').forEach(function(b){b.disabled=d})}
+  // controlla che il sito pubblicato mostri la novità
+  function watch(v,i){
+    var n=0,t=setInterval(async function(){
+      n++;try{var r=await fetch('lim-config.json?t='+Date.now(),{cache:'no-store'});var c=r.ok?await r.json():null;
+        if(c&&c.v===v){clearInterval(t);msg(i,'Online: le passeggiate mostrano la nuova LIM.','ok');return}}catch(e){}
+      if(n>24){clearInterval(t);msg(i,'Salvato, ma la pubblicazione sta richiedendo più del solito. Riprova a ricaricare tra poco.','')}
+    },8000);
+  }
+  async function loadPublic(){
+    try{
+      var r=await fetch('lim-config.json?t='+Date.now(),{cache:'no-store'});
+      if(!r.ok)throw 0;cfg=await r.json();if(!Array.isArray(cfg.slots))cfg.slots=[{},{},{}];
+      render();setStatus('on',connReady()?'Pronto. Le modifiche vengono pubblicate su GitHub.':'Configurazione letta. Per salvare completa il collegamento a GitHub.');
+    }catch(e){setStatus('off','Non riesco a leggere lim-config.json. Apri la pagina dal sito pubblicato, non dal file sul computer.')}
+  }
+
+  // ---- collegamento ----
+  function fillConn(){$('owner').value=conn.owner;$('repo').value=conn.repo;$('branch').value=conn.branch;$('token').value=conn.token}
+  function readConn(){conn.owner=$('owner').value.trim();conn.repo=$('repo').value.trim();conn.branch=$('branch').value.trim()||'main';conn.token=$('token').value.trim()}
+  $('saveConn').addEventListener('click',function(){readConn();connMsg(saveConn()?'Collegamento salvato in questo browser.':'Il browser non permette di salvare il collegamento.',saveConn()?'ok':'err');loadPublic()});
+  $('testConn').addEventListener('click',async function(){
+    readConn();if(!connReady()){connMsg('Compila tutti i campi.','err');return}
+    connMsg('Controllo…');
+    try{var r=await gh(repoUrl());if(r.status===404)throw new Error('Repository non trovato. Controlla utente e nome.');
+      if(!r.ok)throw new Error('GitHub ha risposto '+r.status+'.');var j=await r.json();
+      connMsg(j.permissions&&j.permissions.push===false?'Collegato, ma il token non può scrivere.':'Collegato a '+j.full_name+'. Puoi salvare.',j.permissions&&j.permissions.push===false?'err':'ok')}
+    catch(e){connMsg(e.message||'Collegamento non riuscito.','err')}
+  });
+
+  build();fillConn();if(!connReady())$('conn').open=true;loadPublic();
+})();
+</script>
+</body>
+</html>
